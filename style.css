@@ -1,0 +1,35 @@
+#clickprompt {
+	position: fixed;
+	top: 0;
+	left: 0;
+	height: 100vh;
+	width: 100vw;
+}
+/* obsolete due to zebra
+tr:nth-of-type(2n) > td {
+	background-color: #444;
+}
+
+tr:nth-of-type(2n+1) > td {
+	background-color: #222;
+}*/
+
+.smallcolumn {
+  max-width: 80px;
+  width: 50px;
+}
+
+.right {
+	text-align:right;
+}
+
+/* overrides */
+
+.tablesorter-dark td {
+	padding-top: 0px !important;
+	padding-bottom: 0px !important;
+	padding-left: 4px !important;
+	padding-right: 4px !important;
+	
+	font-size: 12px;
+}
