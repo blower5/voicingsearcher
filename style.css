@@ -1,3 +1,7 @@
+body {
+	background-color: #333;
+}
+
 #clickprompt {
 	position: fixed;
 	top: 0;

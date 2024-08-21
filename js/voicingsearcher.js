@@ -107,18 +107,29 @@ function getIntervalInfo(voicing) {
 	return [consonanceScore,quintalScore];
 }
 
-const sampler = new Tone.Sampler({
-		urls: {
-			"A#2": "Bb2.mp3",
-			"F2":  "F2.mp3",
-			"C3": "C3.mp3",
-			"F3": "F3.mp3",
-			"A4": "A4.mp3", 
-			//"C4": "C4.mp3"
-		},
-		release: 1,
-		baseUrl: "guitar/"
-	}).toDestination();
+const fmsynth = new Tone.PolySynth(Tone.FMSynth,{
+	oscillator: {
+		type: "sine",
+	},
+	modulation: {
+		type: "sine",
+	},
+	harmonicity: 5,
+	modulationIndex: 5,
+	modulationEnvelope: {
+		attack: 0.01,
+		decay: 0.8,
+		sustain: 0.1,
+		release: 0.8,
+	},
+	envelope: {
+		attack: 0.01,
+		decay: 6.0,
+		sustain: 0.0,
+		release: 0.1,
+	},
+}).toDestination();
+fmsynth.maxPolyphony = 128;
 	
 function playVoicing(voicing,transpose) {
 	frequencies = voicing.map( e => (
@@ -127,7 +138,7 @@ function playVoicing(voicing,transpose) {
 		e = mtof(e)
 	));
 	for (i in frequencies) {
-		sampler.triggerAttackRelease(frequencies[i],"1n",Tone.now() + i/16);
+		fmsynth.triggerAttackRelease(frequencies[i],"1n",Tone.now() + i/16);
 	}
 }
 
