@@ -109,12 +109,12 @@ function getIntervalInfo(voicing) {
 
 const sampler = new Tone.Sampler({
 		urls: {
-			"A#3": "Bb2.mp3",
-			"F3":  "F2.mp3",
-			"C4": "C3.mp3",
-			"F4": "F3.mp3",
-			"A5": "A4.mp3", 
-			"C5": "C4.mp3"
+			"A#2": "Bb2.mp3",
+			"F2":  "F2.mp3",
+			"C3": "C3.mp3",
+			"F3": "F3.mp3",
+			"A4": "A4.mp3", 
+			//"C4": "C4.mp3"
 		},
 		release: 1,
 		baseUrl: "guitar/"
