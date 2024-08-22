@@ -4,9 +4,8 @@ chordNames = {
 	'02': 'major second / 9th',
 	'03': 'minor third',
 	'04': 'major third',
-	'05': 'fourth',
+	'05': 'fourth / fifth',
 	'06': 'tritone / #11th / b5th',
-	'07': 'fifth',
 	
 	
 	'037': 'min',

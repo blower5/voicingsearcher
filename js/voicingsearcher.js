@@ -1,7 +1,15 @@
-const VOICING_MAX_WIDTH = 19; //max voicing distance between low and high note
+const VOICING_MAX_WIDTH_DEFAULT = 19; //max voicing distance between low and high note
+var VOICING_MAX_WIDTH = 19;
 const VOICING_MIN_NOTES = 4;  //because two notes aren't useful
-const VOICING_MAX_NOTES = 5;  //
-const CONSONANCE_VECTOR = [0,-2,1,1,1,0,-1,2,0,1,0,0,2,-2,1,1,1,0,-1,2];
+const VOICING_MAX_NOTES = 5;  //hexachords are hard to name in a useful way
+
+//generally minor 2nds and minor 9ths are very dissonant and are disincentivized. octaves and fifths are 
+//very consonant. 
+const CONSONANCE_VECTOR = [0,-2,1,1,1,0,-1,2,0,1,0,0,2,-2,1,1,1,0,-1,2,0,1,0,0,2];
+
+//small intervals and intervals over a fifth have to be disincentivized or chords like 0 1 2 18 19, 
+//which are not wide inbetween the notes, get top spot. 
+const WIDTH_VECTOR = [0,-3,-2,-1,0,1,2,3,3,3,4,4,4,5,5,5,5,6]; 
 
 
 //midi note to frequency
@@ -23,37 +31,37 @@ function rms(A) {
 }
 
 function calcSubset(A, res, subset, index, minSize, maxSize) {
-    // Add the current subset to the result list
+	// Add the current subset to the result list
 	if (subset.length <= maxSize & subset.length >= minSize) {
 		res.push([...subset]);
 	}
 
-    // Generate subsets by recursively including and excluding elements
-    for (let i = index; i < A.length; i++) {
-        // Include the current element in the subset
-        subset.push(A[i]);
+	// Generate subsets by recursively including and excluding elements
+	for (let i = index; i < A.length; i++) {
+		// Include the current element in the subset
+		subset.push(A[i]);
 
-        // Recursively generate subsets with the current element included
-        calcSubset(A, res, subset, i + 1, minSize, maxSize);
+		// Recursively generate subsets with the current element included
+		calcSubset(A, res, subset, i + 1, minSize, maxSize);
 
-        // Exclude the current element from the subset (backtracking)
-        subset.pop();
-    }
+		// Exclude the current element from the subset (backtracking)
+		subset.pop();
+	}
 }
 
 //find all subsets in set A
 function subsets(A, minSize, maxSize) {
-    const subset = [];
-    const res = [];
-    let index = 0;
-    calcSubset(A, res, subset, index, minSize, maxSize);
-    return res;
+	const subset = [];
+	const res = [];
+	let index = 0;
+	calcSubset(A, res, subset, index, minSize, maxSize);
+	return res;
 }
 
 function removeDuplicates(A) {
-    return A.sort((a, b) => a - b).filter(function(item, pos, ary) {
-        return !pos || item != ary[pos - 1];
-    });
+	return A.sort((a, b) => a - b).filter(function(item, pos, ary) {
+		return !pos || item != ary[pos - 1];
+	});
 }
 
 //multipurpose function that calculates the reduced set and returns the chord name and some other stuff
@@ -87,24 +95,27 @@ function getsetInfo(voicing) {
 
 //calculates interval vector as well as interval scores
 function getIntervalInfo(voicing) {
-	let iV = new Array(20);
+	let iV = new Array(VOICING_MAX_WIDTH+1);
 	iV.fill(0);
 	let allPairs = subsets(voicing,2,2);
 	let j = 0;
 	//calculate interval vector
 	for (i of allPairs) {
 		j = Math.abs(i[1] - i[0]); //i[0] should always be smaller than i[1] but abs() just in case
-		if (j <= 19) iV[j]++;
+		if (j <= VOICING_MAX_WIDTH) iV[j]++;
 	}
 	
 	//let tertianScore = ( iV[3] + iV[4] + iV[15] + iV[16] ) * 2 + iV[8] + iV[9]; 
 	let quintalScore = ( iV[7] + iV[14] + iV[5] + iV[10] ) * 2 + iV[2] + iV[19] + iV[17] //TODO define this in a smart way
 	let consonanceScore = 0;
-	for (let i = 0; i < 20; i++) {
-		consonanceScore += iV[i] * CONSONANCE_VECTOR[i];
+	let widthScore = 0;
+	for (let i = 0; i < VOICING_MAX_WIDTH + 1; i++) {
+		consonanceScore += iV[i] * (CONSONANCE_VECTOR[i] ?? 0);
+		widthScore      += iV[i] * (WIDTH_VECTOR[i]      ?? 6);
 	}
 	
-	return [consonanceScore,quintalScore];
+	//golf-ful oneliner that normalizes and formats the scores
+	return [consonanceScore,quintalScore,widthScore].map(e=>(e/allPairs.length).toFixed(1));
 }
 
 const fmsynth = new Tone.PolySynth(Tone.FMSynth,{
@@ -114,8 +125,8 @@ const fmsynth = new Tone.PolySynth(Tone.FMSynth,{
 	modulation: {
 		type: "sine",
 	},
-	harmonicity: 5,
-	modulationIndex: 5,
+	harmonicity: 5, //(this basically just means modulator coarse tuning)
+	modulationIndex: 5, //modulator level
 	modulationEnvelope: {
 		attack: 0.01,
 		decay: 0.8,
@@ -154,7 +165,7 @@ function listVoicing(tablebody,voicing) {
 	
 	let tdconsonance = document.createElement('td');
 	let tdquintal = document.createElement('td');
-	let tdrms = document.createElement('td');
+	let tdwidth = document.createElement('td');
 	
 	let setinfo = getsetInfo(voicing);
 	let intervalinfo = getIntervalInfo(voicing);
@@ -169,11 +180,11 @@ function listVoicing(tablebody,voicing) {
 	
 	tdconsonance.textContent = intervalinfo[0];
 	tdquintal.textContent = intervalinfo[1];
-	tdrms.textContent = rms(voicing).toFixed(1);
+	tdwidth.textContent = intervalinfo[2];
 	
 	tdconsonance.className = "right";
 	tdquintal.className = "right";
-	tdrms.className = "right";
+	tdwidth.className = "right";
 	
 	tr.appendChild(tdvoicing);
 	tr.appendChild(tdset);
@@ -183,7 +194,7 @@ function listVoicing(tablebody,voicing) {
 	
 	tr.appendChild(tdconsonance);
 	tr.appendChild(tdquintal);
-	tr.appendChild(tdrms);
+	tr.appendChild(tdwidth);
 	
 	tablebody.appendChild(tr);
 }
@@ -191,10 +202,12 @@ function listVoicing(tablebody,voicing) {
 window.addEventListener('DOMContentLoaded', (event) => {
 	clickprompt = document.getElementById("clickprompt");
 	clickprompt.addEventListener("click", async () => {
-        await Tone.start();
+		await Tone.start();
 		console.log("tone.js ready");
 		clickprompt.remove();
 	})
+	
+	VOICING_MAX_WIDTH = parseInt(new URLSearchParams(window.location.search).get('maxwidth') ?? VOICING_MAX_WIDTH_DEFAULT);
 	
 	//initialize table sorter
 	$(".tablesorter").tablesorter({
@@ -203,28 +216,26 @@ window.addEventListener('DOMContentLoaded', (event) => {
 		headerTemplate : '{content} {icon}', // Add icon for various themes
 		widgets: ['stickyHeaders', 'filter', 'zebra'],
 		widgetOptions: {
-
-		  // extra class name added to the sticky header row
-		  stickyHeaders : '',
-		  // number or jquery selector targeting the position:fixed element
-		  stickyHeaders_offset : 0,
-		  // added to table ID, if it exists
-		  stickyHeaders_cloneId : '-sticky',
-		  // trigger "resize" event on headers
-		  stickyHeaders_addResizeEvent : true,
-		  // if false and a caption exist, it won't be included in the sticky header
-		  stickyHeaders_includeCaption : true,
-		  // The zIndex of the stickyHeaders, allows the user to adjust this to their needs
-		  stickyHeaders_zIndex : 2,
-		  // jQuery selector or object to attach sticky header to
-		  stickyHeaders_attachTo : null,
-		  // jQuery selector or object to monitor horizontal scroll position (defaults: xScroll > attachTo > window)
-		  stickyHeaders_xScroll : null,
-		  // jQuery selector or object to monitor vertical scroll position (defaults: yScroll > attachTo > window)
-		  stickyHeaders_yScroll : null,
-
-		  // scroll table top into view after filtering
-		  stickyHeaders_filteredToTop: true
+			// extra class name added to the sticky header row
+			stickyHeaders : '',
+			// number or jquery selector targeting the position:fixed element
+			stickyHeaders_offset : 0,
+			// added to table ID, if it exists
+			stickyHeaders_cloneId : '-sticky',
+			// trigger "resize" event on headers
+			stickyHeaders_addResizeEvent : true,
+			// if false and a caption exist, it won't be included in the sticky header
+			stickyHeaders_includeCaption : true,
+			// The zIndex of the stickyHeaders, allows the user to adjust this to their needs
+			stickyHeaders_zIndex : 2,
+			// jQuery selector or object to attach sticky header to
+			stickyHeaders_attachTo : null,
+			// jQuery selector or object to monitor horizontal scroll position (defaults: xScroll > attachTo > window)
+			stickyHeaders_xScroll : null,
+			// jQuery selector or object to monitor vertical scroll position (defaults: yScroll > attachTo > window)
+			stickyHeaders_yScroll : null,
+			// scroll table top into view after filtering
+			stickyHeaders_filteredToTop: true
 		},
 		headers: {
 			0: { sorter: "text" },
