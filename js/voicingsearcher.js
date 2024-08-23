@@ -1,7 +1,7 @@
 const VOICING_MAX_WIDTH_DEFAULT = 19; //max voicing distance between low and high note
 var VOICING_MAX_WIDTH = 19;
 const VOICING_MIN_NOTES = 4;  //because two notes aren't useful
-const VOICING_MAX_NOTES = 5;  //hexachords are hard to name in a useful way
+const VOICING_MAX_NOTES = 5;
 
 //generally minor 2nds and minor 9ths are very dissonant and are disincentivized. octaves and fifths are 
 //very consonant. 
@@ -88,7 +88,7 @@ function getsetInfo(voicing) {
 	);
 	A.sort((a, b) => parseInt(a,12) - parseInt(b,12)); //A now contains readable sorted and reduced set
 	//find name for A
-	let name = chordNames[A.join("")] ?? "";
+	let name = chordNames[A.join("")] ?? ""; //defined in chordnames2.js
 	
 	return [A,amountToRotate,name];
 }
@@ -216,24 +216,8 @@ window.addEventListener('DOMContentLoaded', (event) => {
 		headerTemplate : '{content} {icon}', // Add icon for various themes
 		widgets: ['stickyHeaders', 'filter', 'zebra'],
 		widgetOptions: {
-			// extra class name added to the sticky header row
-			stickyHeaders : '',
-			// number or jquery selector targeting the position:fixed element
-			stickyHeaders_offset : 0,
-			// added to table ID, if it exists
-			stickyHeaders_cloneId : '-sticky',
-			// trigger "resize" event on headers
-			stickyHeaders_addResizeEvent : true,
-			// if false and a caption exist, it won't be included in the sticky header
-			stickyHeaders_includeCaption : true,
 			// The zIndex of the stickyHeaders, allows the user to adjust this to their needs
 			stickyHeaders_zIndex : 2,
-			// jQuery selector or object to attach sticky header to
-			stickyHeaders_attachTo : null,
-			// jQuery selector or object to monitor horizontal scroll position (defaults: xScroll > attachTo > window)
-			stickyHeaders_xScroll : null,
-			// jQuery selector or object to monitor vertical scroll position (defaults: yScroll > attachTo > window)
-			stickyHeaders_yScroll : null,
 			// scroll table top into view after filtering
 			stickyHeaders_filteredToTop: true
 		},

@@ -7,6 +7,7 @@ chordNames = {
 	'05': 'fourth / fifth',
 	'06': 'tritone / #11th / b5th',
 	
+	//minor
 	
 	'037': 'min',
 	'0237': 'min add 9',
@@ -23,6 +24,7 @@ chordNames = {
 	'02357': 'min 11 type 2', //no 7 -- these min 11s don't have a full major triad on the top - this makes them sound noticiably different. interesting!
 	'0235': 'min 11 type 2', //no 5 no 7
 	
+	//major
 	
 	'047': 'maj',
 	'0247': 'maj add 9',
