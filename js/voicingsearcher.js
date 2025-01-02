@@ -2,6 +2,7 @@ const VOICING_MAX_WIDTH_DEFAULT = 19; //max voicing distance between low and hig
 var VOICING_MAX_WIDTH = 19;
 const VOICING_MIN_NOTES = 4;  //because two notes aren't useful
 const VOICING_MAX_NOTES = 5;
+var ONLY_LIST_NAMED = false;
 
 //generally minor 2nds and minor 9ths are very dissonant and are disincentivized. octaves and fifths are 
 //very consonant. 
@@ -168,6 +169,12 @@ function listVoicing(tablebody,voicing) {
 	let tdwidth = document.createElement('td');
 	
 	let setinfo = getsetInfo(voicing);
+	if (ONLY_LIST_NAMED) {
+		if (setinfo[2] == "") {
+			return 0;
+		}
+	}
+	
 	let intervalinfo = getIntervalInfo(voicing);
 	
 	hearbutton.onclick = function() {playVoicing(voicing,setinfo[1])};
@@ -208,8 +215,12 @@ window.addEventListener('DOMContentLoaded', (event) => {
 	})
 	
 	VOICING_MAX_WIDTH = parseInt(new URLSearchParams(window.location.search).get('maxwidth') ?? VOICING_MAX_WIDTH_DEFAULT);
+	ONLY_LIST_NAMED = new URLSearchParams(window.location.search).get('namedonly') == "on";
 	
-	//initialize table sorter
+	document.getElementById('maxwidth').value = VOICING_MAX_WIDTH;
+	document.getElementById('namedonly').checked = ONLY_LIST_NAMED;
+	
+	//initialize table sorter-----------------------------------------------------------------------------------------------------
 	$(".tablesorter").tablesorter({
 		theme: 'dark',
 		ignoreCase: true,
@@ -229,6 +240,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
 		}
 	});
 	console.log("tablesorter ready");
+	//----------------------------------------------------------------------------------------------------------------------------
 	
 	let notesset = [];
 	for (let i = 1; i < VOICING_MAX_WIDTH + 1; i++) {

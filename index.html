@@ -24,8 +24,14 @@
 					set max chord width, in semitones 
 					<input type="number" name="maxwidth" id="maxwidth" value="19" min="12" max="36" required>
 				</label>
-				<input class="button" type="submit" value="reload">
 				<i> setting this above 24 is not recommended</i>
+				<br>
+				<label>
+					only list chords with names
+					<input type="checkbox" name="namedonly" id="namedonly" title="">
+				</label>
+				<br>
+				<input class="button" type="submit" value="reload">
 			</form>
 		</div>
 		<table class="tablesorter" id="resulttable">
