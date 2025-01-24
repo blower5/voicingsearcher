@@ -4,13 +4,15 @@ const VOICING_MIN_NOTES = 4;  //because two notes aren't useful
 const VOICING_MAX_NOTES = 5;
 var ONLY_LIST_NAMED = false;
 
-//generally minor 2nds and minor 9ths are very dissonant and are disincentivized. octaves and fifths are 
+//generally minor 2nds and minor 9ths are very dissonant and are disincentivized. fifths are 
 //very consonant. 
-const CONSONANCE_VECTOR = [0,-2,1,1,1,0,-1,2,0,1,0,0,2,-2,1,1,1,0,-1,2,0,1,0,0,2];
+const CONSONANCE_VECTOR = [0,-2,1,1,1,0,-1,2,0,1,0,0,0,-2,1,1,1,0,-1,2,0,1,0,0,0];
 
 //small intervals and intervals over a fifth have to be disincentivized or chords like 0 1 2 18 19, 
 //which are not wide inbetween the notes, get top spot. 
 const WIDTH_VECTOR = [0,-3,-2,-1,0,1,2,3,3,3,4,4,4,5,5,5,5,6]; 
+
+const QUINTAL_VECTOR = [0,0,1,0,0,2,0,2,0,0,2,0,0,0,2,0,0,1,0,1]; 
 
 
 //midi note to frequency
@@ -107,10 +109,11 @@ function getIntervalInfo(voicing) {
 	}
 	
 	//let tertianScore = ( iV[3] + iV[4] + iV[15] + iV[16] ) * 2 + iV[8] + iV[9]; 
-	let quintalScore = ( iV[7] + iV[14] + iV[5] + iV[10] ) * 2 + iV[2] + iV[19] + iV[17] //TODO define this in a smart way
+	let quintalScore = 0;
 	let consonanceScore = 0;
 	let widthScore = 0;
 	for (let i = 0; i < VOICING_MAX_WIDTH + 1; i++) {
+		quintalScore	=+ iV[i] * (QUINTAL_VECTOR[i]    ?? 0);
 		consonanceScore += iV[i] * (CONSONANCE_VECTOR[i] ?? 0);
 		widthScore      += iV[i] * (WIDTH_VECTOR[i]      ?? 6);
 	}
