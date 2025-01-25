@@ -171,6 +171,8 @@ function listVoicing(tablebody,voicing) {
 	let tdquintal = document.createElement('td');
 	let tdwidth = document.createElement('td');
 	
+	let tdroot = document.createElement('td');
+	
 	let setinfo = getsetInfo(voicing);
 	if (ONLY_LIST_NAMED) {
 		if (setinfo[2] == "") {
@@ -192,13 +194,19 @@ function listVoicing(tablebody,voicing) {
 	tdquintal.textContent = intervalinfo[1];
 	tdwidth.textContent = intervalinfo[2];
 	
+	tdroot.textContent = (setinfo[1] == 0) ? "root" : (setinfo[1]+4)%12-4 +" st";
+	
 	tdconsonance.className = "right";
 	tdquintal.className = "right";
 	tdwidth.className = "right";
 	
+	tdroot.className = "centered";
+	
 	tr.appendChild(tdvoicing);
 	tr.appendChild(tdset);
 	tr.appendChild(tdname);
+	
+	tr.appendChild(tdroot);
 	
 	tr.appendChild(tdbutton);
 	
@@ -239,7 +247,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
 			0: { sorter: "text" },
 			1: { sorter: "text" },
 			2: { sorter: "text" },
-			3: { sorter: false, parser: false, filter: false }
+			4: { sorter: false, parser: false, filter: false }
 		}
 	});
 	console.log("tablesorter ready");
