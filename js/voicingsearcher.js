@@ -1,5 +1,6 @@
 const VOICING_MAX_WIDTH_DEFAULT = 19; //max voicing distance between low and high note
 var VOICING_MAX_WIDTH = 19;
+var VOICING_BASS_INTERVAL_WIDTH = 1;
 const VOICING_MIN_NOTES = 4;  //because two notes aren't useful
 const VOICING_MAX_NOTES = 5;
 var ONLY_LIST_NAMED = false;
@@ -150,6 +151,7 @@ function playVoicing(voicing,transpose) {
 	frequencies = voicing.map( e => (
 		e += 36,
 		e -= transpose, //this extra transpose parameter comes from getsetInfo() and makes each pitch set play in the same key- it cancels out the inversions within a pitch set
+		e -= Math.floor(VOICING_BASS_INTERVAL_WIDTH/2), //this keeps the notes from going super high
 		e = mtof(e)
 	));
 	for (i in frequencies) {
@@ -226,9 +228,11 @@ window.addEventListener('DOMContentLoaded', (event) => {
 	})
 	
 	VOICING_MAX_WIDTH = parseInt(new URLSearchParams(window.location.search).get('maxwidth') ?? VOICING_MAX_WIDTH_DEFAULT);
+	VOICING_BASS_INTERVAL_WIDTH = parseInt(new URLSearchParams(window.location.search).get('basswidth') ?? VOICING_BASS_INTERVAL_WIDTH);
 	ONLY_LIST_NAMED = new URLSearchParams(window.location.search).get('namedonly') == "on";
 	
 	document.getElementById('maxwidth').value = VOICING_MAX_WIDTH;
+	document.getElementById('basswidth').value = VOICING_BASS_INTERVAL_WIDTH;
 	document.getElementById('namedonly').checked = ONLY_LIST_NAMED;
 	
 	//initialize table sorter-----------------------------------------------------------------------------------------------------
@@ -261,6 +265,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
 	
 	let tablebody = document.getElementById('tablebody');
 	for (i in allvoicings) {
+		allvoicings[i] = allvoicings[i].map(v => (v+VOICING_BASS_INTERVAL_WIDTH - 1));
 		allvoicings[i].unshift(0); //add 0 to start
 		listVoicing(tablebody, allvoicings[i]);
 	}
