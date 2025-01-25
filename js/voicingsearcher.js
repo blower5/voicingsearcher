@@ -113,7 +113,7 @@ function getIntervalInfo(voicing) {
 	let consonanceScore = 0;
 	let widthScore = 0;
 	for (let i = 0; i < VOICING_MAX_WIDTH + 1; i++) {
-		quintalScore	=+ iV[i] * (QUINTAL_VECTOR[i]    ?? 0);
+		quintalScore	+= iV[i] * (QUINTAL_VECTOR[i]    ?? 0);
 		consonanceScore += iV[i] * (CONSONANCE_VECTOR[i] ?? 0);
 		widthScore      += iV[i] * (WIDTH_VECTOR[i]      ?? 6);
 	}
